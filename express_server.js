@@ -57,12 +57,13 @@ app.post("/urls", (req, res) => {
     console.log(req.body);  // Log the POST request body to the console
     res.send("Ok");         // Respond with 'Ok' (we will replace this)
   });
-//------------------------generateRandomString-----------------------
-// const generateRandomString = function() {
-//     let result = '';
-//     const char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-//     for(let i = 0; i < 6; i++) {
-//         result += char.charAt(Math.floor(Math.random() * char.length));
-//     }
-//     return result;
-// }
+
+//   ------------------------generateRandomString-----------------------
+const generateRandomString = function() {
+    let result = '';
+    const char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    for(let i = 0; i < 6; i++) {
+        result += char.charAt(Math.floor(Math.random() * char.length));
+    }
+    return result;
+}
