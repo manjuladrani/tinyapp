@@ -6,7 +6,6 @@ const cookieParser = require('cookie-parser');
 app.use(bodyParser.urlencoded({extended: true}));
 
 
-
 app.set("view engine", "ejs");
 
 //-----------------------------------[URL database]------------------
@@ -24,7 +23,11 @@ const generateRandomString = function() {
     return result;
   };
 
-
+  const templateVars = {
+    username: req.cookies["username"],
+    // ... any other vars
+  };
+  res.render("urls_index", templateVars);
 //--------------------------------------------------------------------
 app.get("/", (req, res) => {
   res.send("Hello!");
