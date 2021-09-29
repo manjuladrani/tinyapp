@@ -23,11 +23,11 @@ const generateRandomString = function() {
     return result;
   };
 
-  const templateVars = {
-    username: req.cookies["username"],
-    // ... any other vars
-  };
-  res.render("urls_index", templateVars);
+//   const templateVars = {
+//     username: req.cookies["username"],
+//     // ... any other vars
+//   };
+//   res.render("urls_index", templateVars);
 //--------------------------------------------------------------------
 app.get("/", (req, res) => {
   res.send("Hello!");
