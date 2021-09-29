@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const PORT = 8080;
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
 app.use(bodyParser.urlencoded({extended: true}));
 
 
@@ -73,7 +74,14 @@ app.get("/u/:shortURL", (req, res) => {
 
 });
 //--------------------------------------------------------------------
+app.get("/login", (req, res) => {
+    let userId = req.session.user_id;
+    let templateVars = {
+        user: users[userID]
+    };
 
+    res.render('urls_login',templateVars);
+})
 
 
 
@@ -100,3 +108,4 @@ app.post("/urls", (req, res) => {
         res.redirect('/urls');
     }
  })
+
