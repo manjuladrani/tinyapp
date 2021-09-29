@@ -25,6 +25,11 @@ const generateRandomString = function() {
     return result;
   };
 
+//   const templateVars = {
+//     username: req.cookies["username"],
+//     // ... any other vars
+//   };
+//   res.render("urls_index", templateVars);
 //--------------------------------------------------------------------
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -83,7 +88,14 @@ app.get("/u/:shortURL", (req, res) => {
 
 });
 //--------------------------------------------------------------------
+app.get("/login", (req, res) => {
+    let userId = req.session.user_id;
+    let templateVars = {
+        user: users[userID]
+    };
 
+    res.render('urls_login',templateVars);
+})
 
 
 
