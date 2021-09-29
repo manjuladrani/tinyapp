@@ -83,7 +83,7 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 //--------------------------------------------------------------------------
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = {longUrL: req.params.longURL};
+  const longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
 
 });
