@@ -1,9 +1,10 @@
 const express = require("express");
-const app = express();
+const uuid = require('uuid/v4');
+
 const PORT = 8080;
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser')
-
+const app = express();
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.use(cookieParser());
@@ -16,6 +17,20 @@ const urlDatabase = {
     "9sm5xK": "http://www.google.com"
   };
 
+const userDatabase = {
+    gd45bif4: {
+        id: 'gd45bif4',
+        name: 'ved',
+        email: 'ved.playing@toys.com',
+        password: 'cars'
+    },
+    hatd56dg: {
+        id: 'hatd56dg',
+        name: 'Bob',
+        email: 'bob.eating@fry.com',
+        password: 'eating'
+    },
+};
 const generateRandomString = function() {
     let result = '';
     const char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -25,6 +40,8 @@ const generateRandomString = function() {
     return result;
   };
 
+  
+  
 //   const templateVars = {
 //     username: req.cookies["username"],
 //     // ... any other vars
@@ -134,3 +151,23 @@ app.post("/urls", (req, res) => {
      res.clearCookie("username");
      res.redirect("/urls");
  })
+
+ app.get('/register', (req, res) => {
+    
+    //const username = req.cookies["username"]
+    let templateVars = {
+        username: null
+        
+    };
+    // display the register form
+    res.render('register', templateVars);
+  });
+
+app.post('register', (req, res) => {
+    //need to extract the info from the body
+    const name = req.body.name;
+    const email = req.body.email;
+    const password = req.body.password;
+
+ 
+});
