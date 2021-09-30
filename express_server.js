@@ -30,6 +30,7 @@ const urlDatabase = {
       password: "dishwasher-funk"
     }
   }
+
 const generateRandomString = function() {
     let result = '';
     const char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -83,7 +84,7 @@ app.listen(PORT, () => {
 app.get("/urls", (req, res) => {
   const username = req.cookies["username"]
   const templateVars = { 
-    username,  
+    username: username,  
     urls: urlDatabase 
 };
   res.render("urls_index", templateVars);
@@ -92,7 +93,7 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
     const username = req.cookies["username"]
     const templateVars = { 
-      username
+      username: username
   };
     res.render("urls_new", templateVars);
 });
@@ -107,7 +108,7 @@ app.get("/urls.json", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const username = req.cookies["username"]
   const templateVars = {
-    username,  
+    username: username,  
     shortURL: req.params.shortURL,
     
     longURL: urlDatabase[req.params.shortURL]
@@ -128,7 +129,8 @@ app.get("/login", (req, res) => {
     //const username = req.cookies["username"]
     let templateVars = {
         //username,
-        user: users[userId]
+        user: users[userId],
+        username: null
     };
 
     res.render('login',templateVars);
@@ -174,7 +176,7 @@ app.post("/urls", (req, res) => {
     //req.session.user_id = user.id;
      //res.cookie('user_Id', user_Id);
      res.cookie('user_Id', user.id);
-     res.cookie("username", req.body.username);
+     res.cookie("username", req.body.email);
      res.redirect("/urls");
  });
 
@@ -188,7 +190,6 @@ app.post("/urls", (req, res) => {
     const username = req.cookies["username"]
     let templateVars = {
         username: null
-        
     };
     
     // display the register form
@@ -197,32 +198,22 @@ app.post("/urls", (req, res) => {
 
 app.post('/register', (req, res) => {
     //need to extract the info from the body
-    console.log('req.body:', req.body);
-    const email = req.body.email;
-    const password = req.body.password;
+    const { email, password } = req.body
+    if (!email || !password) return res.status(400).send("Email or password cant be empty");
+    if (finduserByEmail(email, users)) return res.status(400).send("Email is taken");
 
-    
-if (finduserByEmail(email, users)) {
-    res.status(400).send("Email already exist");
-    //res.redirect(400, '/register' );
-  } else if (!email) {
-    res.redirect(400, '/register');
-  } else if (!password) {
-    res.redirect(400, '/register');
-  } else {
-      //const username = generateRandomString;
-      const user_Id = createNewUser_id();
-     users[user_Id] = {
-         id: user_Id,
-         email,
-         password
-     };
-  }
-  res.cookie('user_Id', user_Id);
-  res.cookie("username", req.body.user_Id);
-  res.redirect('/urls');
+    const newUserrandomID = generateRandomString()
+    const newUser = {
+      id: newUserrandomID,
+      email: email,
+      password: password
+    }
+
+    users[newUserrandomID] = newUser
+
+    res.cookie('user_Id', newUserrandomID);
+    res.cookie("username", email);
+    res.redirect('/urls');
 });
 
 
-
-    
