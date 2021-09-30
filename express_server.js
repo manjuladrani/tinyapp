@@ -3,7 +3,8 @@ const uuid = require('uuid/v4');
 
 const PORT = 8080;
 const bodyParser = require("body-parser");
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
+const { name } = require("body-parser");
 const app = express();
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -17,20 +18,18 @@ const urlDatabase = {
     "9sm5xK": "http://www.google.com"
   };
 
-const userDatabase = {
-    gd45bif4: {
-        id: 'gd45bif4',
-        name: 'ved',
-        email: 'ved.playing@toys.com',
-        password: 'cars'
+  const users = { 
+    "userRandomID": {
+      id: "userRandomID", 
+      email: "user@example.com", 
+      password: "purple-monkey-dinosaur"
     },
-    hatd56dg: {
-        id: 'hatd56dg',
-        name: 'Bob',
-        email: 'bob.eating@fry.com',
-        password: 'eating'
-    },
-};
+   "user2RandomID": {
+      id: "user2RandomID", 
+      email: "user2@example.com", 
+      password: "dishwasher-funk"
+    }
+  }
 const generateRandomString = function() {
     let result = '';
     const char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -39,14 +38,33 @@ const generateRandomString = function() {
     }
     return result;
   };
+ const createNewUser_id = () => {
+     return user_Id = uuid().substr(0, 7);
+     
+    //  const newuserid = {
+    //      id: user_Id,
+         
+    //  };
+    //  users[user_Id] = newuserid;
+ }
+ const finduserByEmail = function (email, users) {
+    for (let userId in users) {
+        
+        if (email === users[userId].email) {
+            return true;
+        }
+    }
+    return false;
+};
+const auyhenticateUser =function (email, password, users) {
 
-  
-  
-//   const templateVars = {
-//     username: req.cookies["username"],
-//     // ... any other vars
-//   };
-//   res.render("urls_index", templateVars);
+    const userFound = finduserByEmail(email, users);
+
+    if(userFound && userFound.password === password) {
+        return userFound;
+    }
+    return false;
+}
 //--------------------------------------------------------------------
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -107,9 +125,9 @@ app.get("/u/:shortURL", (req, res) => {
 //--------------------------------------------------------------------
 app.get("/login", (req, res) => {
     let userId = req.session.user_id;
-    const username = req.cookies["username"]
+    //const username = req.cookies["username"]
     let templateVars = {
-        username,
+        //username,
         user: users[userID]
     };
 
@@ -143,9 +161,21 @@ app.post("/urls", (req, res) => {
  })
 
  app.post("/login", (req, res) => {
+    console.log('req.body:', req.body);
+    const email = req.body.email;
+    const password = req.body.password;
+    const user = finduserByEmail(req.body.email, users);
+    //  if(req.body.password === user['password']){
+    //      req.session.user_id = user.id;
+    //      res.redirect('/urls');
+    //  }
+
+    
+    req.session.user_id = user.id;
+     res.cookie('user_Id', user_Id);
      res.cookie("username", req.body.username);
      res.redirect("/urls");
- })
+ });
 
  app.post("/logout", (req, res) => {
      res.clearCookie("username");
@@ -154,20 +184,43 @@ app.post("/urls", (req, res) => {
 
  app.get('/register', (req, res) => {
     
-    //const username = req.cookies["username"]
+    const username = req.cookies["username"]
     let templateVars = {
         username: null
         
     };
+    
     // display the register form
     res.render('register', templateVars);
   });
 
-app.post('register', (req, res) => {
+app.post('/register', (req, res) => {
     //need to extract the info from the body
-    const name = req.body.name;
+    console.log('req.body:', req.body);
     const email = req.body.email;
     const password = req.body.password;
 
- 
+    
+if (finduserByEmail(email)) {
+    res.redirect(400, '/register');
+  } else if (!email) {
+    res.redirect(400, '/register');
+  } else if (!password) {
+    res.redirect(400, '/register');
+  } else {
+      const username = generateRandomString;
+      const user_Id = createNewUser_id();
+     users[user_Id] = {
+         id: user_Id,
+         email,
+         password
+     };
+  }
+  res.cookie('user_Id', user_Id);
+  res.cookie("username", req.body.user_Id);
+  res.redirect('/urls');
 });
+
+
+
+    

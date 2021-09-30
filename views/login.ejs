@@ -7,14 +7,14 @@
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
     
-        <title>Registration Form</title>
+        <title>New User - TinyApp</title>
       </head>
 <body>
     <%- include('partials/_header') %> 
 
 <div class= "container">
-    <h1> Registration Form</h1>
-    <form method="POST" action="/register">
+    <h1> LogIn</h1>
+    <form method="POST" action="/login">
     
       <div class="form-group">
       <label for="email">Email:</label>
@@ -22,7 +22,6 @@
         style="width: 100%"
         type="email"
         name="email"
-        id="email"
         placeholder="Please enter your email">
       </div>
       <div class="form-group">
@@ -31,10 +30,9 @@
         style="width: 100%"
         type="password"
         name="password"
-        id="password"
         placeholder="Please enter your password">
         </div>
-        <input type="submit" class="btn btn-primary" value="Register" />
+        <input type="submit" class="btn btn-primary" value="Login">
 
         
     </div>
