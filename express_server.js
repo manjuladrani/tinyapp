@@ -51,7 +51,7 @@ const generateRandomString = function() {
     for (let userId in users) {
         
         if (email === users[userId].email) {
-            return true;
+            return users[userId];
         }
     }
     return false;
@@ -124,14 +124,14 @@ app.get("/u/:shortURL", (req, res) => {
 });
 //--------------------------------------------------------------------
 app.get("/login", (req, res) => {
-    let userId = req.session.user_id;
+    let userId = req.cookies['userId'];
     //const username = req.cookies["username"]
     let templateVars = {
         //username,
-        user: users[userID]
+        user: users[userId]
     };
 
-    res.render('urls_login',templateVars);
+    res.render('login',templateVars);
 })
 
 
@@ -171,8 +171,9 @@ app.post("/urls", (req, res) => {
     //  }
 
     
-    req.session.user_id = user.id;
-     res.cookie('user_Id', user_Id);
+    //req.session.user_id = user.id;
+     //res.cookie('user_Id', user_Id);
+     res.cookie('user_Id', user.id);
      res.cookie("username", req.body.username);
      res.redirect("/urls");
  });
@@ -201,14 +202,15 @@ app.post('/register', (req, res) => {
     const password = req.body.password;
 
     
-if (finduserByEmail(email)) {
-    res.redirect(400, '/register');
+if (finduserByEmail(email, users)) {
+    res.status(400).send("Email already exist");
+    //res.redirect(400, '/register' );
   } else if (!email) {
     res.redirect(400, '/register');
   } else if (!password) {
     res.redirect(400, '/register');
   } else {
-      const username = generateRandomString;
+      //const username = generateRandomString;
       const user_Id = createNewUser_id();
      users[user_Id] = {
          id: user_Id,
