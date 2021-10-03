@@ -1,4 +1,4 @@
-const finduserByEmail = function (email, users) {
+const getUserByEmail = function (email, users) {
     for (let userId in users) {
         
         if (email === users[userId].email) {
@@ -29,4 +29,4 @@ const urlsForUser = function(id, urlDatabase) {
     return userUrls;
   };
 
-  module.exports = { finduserByEmail, generateRandomString, urlsForUser };
+  module.exports = { getUserByEmail, generateRandomString, urlsForUser };

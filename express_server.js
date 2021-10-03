@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 //const cookieParser = require('cookie-parser');
 const { name } = require("body-parser");
-const { finduserByEmail, generateRandomString, urlsForUser } = require('./helpers');
+const { getUserByEmail, generateRandomString, urlsForUser } = require('./helpers');
 
 
 const app = express();
@@ -201,7 +201,7 @@ app.post("/urls", (req, res) => {
       };
       return res.status(401).render('login', templateVars);
     }
-    const user = finduserByEmail(email, users);
+    const user = getUserByEmail(email, users);
     //console.log("user Id from line 170", useId);
     console.log(user);
     //console.log(user['id']);
@@ -283,7 +283,7 @@ app.post('/register', (req, res) => {
     };
     return res.status(400).render('register', templateVars);
   }
-    if (finduserByEmail(email, users)){
+    if (getUserByEmail(email, users)) {
       let templateVars = {
         user: null,
         error: "Email is already Exist!"
