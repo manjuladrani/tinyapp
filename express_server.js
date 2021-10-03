@@ -1,6 +1,6 @@
 const express = require("express");
 const uuid = require('uuid/v4');
-
+const bcrypt = require('bcryptjs');
 const PORT = 8080;
 const bodyParser = require("body-parser");
 //const cookieSession = require("cookie-session");
@@ -39,12 +39,12 @@ app.set("view engine", "ejs");
     "userRandomID": {
       id: "userRandomID", 
       email: "user@example.com", 
-      password: "purple-monkey-dinosaur"
+      password: bcrypt.hashSync("purple-monkey-dinosaur", 10)
     },
    "user2RandomID": {
       id: "user2RandomID", 
       email: "user2@example.com", 
-      password: "dishwasher-funk"
+      password: bcrypt.hashSync("dishwasher-funk", 10)
     }
   }
 
@@ -193,11 +193,12 @@ app.post("/urls", (req, res) => {
   
  app.post('/urls/:shortURL/delete', (req, res) => {
      if (urlDatabase[req.params.shortURL]) {
+        
          delete urlDatabase[req.params.shortURL];
          res.redirect('/urls');
      }
 
- })
+ });
  app.post('/urls/:shortURL', (req, res) => {
     if (urlDatabase[req.params.shortURL]) {
         urlDatabase[req.params.shortURL]['longURL'] = req.body.longURL;
@@ -221,7 +222,7 @@ app.post("/urls", (req, res) => {
     //console.log("user Id from line 170", useId);
     console.log(user);
     console.log(user['id']);
-    const user_id = user['id'];
+    //const user_id = user['id'];
    // const newUserrandomID = generateRandomString()
    
     
@@ -231,19 +232,21 @@ app.post("/urls", (req, res) => {
         user: null,
         error: "User is not registerd!"
       };
-      return res.status(401).render('login', templateVars);
+      return res.status(403).render('login', templateVars);
     }
-
-   if (user['password'] !== password) {
+    
+    if (user && !bcrypt.compareSync(password, user.password)) {
      let templateVars = {
        user: null,
        error: "Wrong credentials entered. Please correct them"
      };
-     return res.status(401).render('login', templateVars);
+     return res.status(403).render('login', templateVars);
    }
-
-   res.cookie("user_id", user_id);
-   return res.redirect("/urls");
+   
+    res.cookie("user_id", user.id);
+    return res.redirect("/urls");
+   
+   
      /* if(user) {
       //  console.log('password' + password + 'l');
       //  console.log(user['password']);
@@ -273,7 +276,7 @@ app.post("/urls", (req, res) => {
 
  app.get('/register', (req, res) => {
     
-   const user_id = req.cookies["user_id"]
+   
     let templateVars = {
         user: null,
         error: ''
@@ -286,6 +289,8 @@ app.post("/urls", (req, res) => {
 app.post('/register', (req, res) => {
     //need to extract the info from the body
     const { email, password } = req.body
+    const user_id = req.cookies["user_id"];
+   
     //if (!email || !password) return res.status(400).send("Email or password cant be empty");
   if (email === '' || password === '') {
     let templateVars = {
@@ -307,14 +312,16 @@ app.post('/register', (req, res) => {
     const newUser = {
       id: newUserrandomID,
       email: email,
-      password: password
+      password: bcrypt.hashSync(password, 10)
     }
 
     users[newUserrandomID] = newUser
 
+    
     res.cookie('user_id', newUserrandomID);
     //res.cookie("username", email);
     res.redirect('/urls');
+  
 });
 
 
