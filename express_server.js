@@ -107,18 +107,28 @@ app.listen(PORT, () => {
 
 //--------------------------------------------------------------------
 app.get("/urls", (req, res) => {
+  
   const user_id = req.cookies["user_id"];
+  if(user_id) {
   const user = users[user_id];
-  const templateVars = { 
-     user,  
-    urls: urlDatabase 
+  const userUrls = urlsForUser(user_id, urlDatabase);
+  let templateVars = { 
+     user: users[user_id],  
+    urls: userUrls 
     
 };
-  res.render("urls_index", templateVars)
+  res.render("urls_index", templateVars);
+  } else {
+    res.redirect('/login');
+  }
 });
 //--------------------------------------------------------------------
 app.get("/urls/new", (req, res) => {
     const user_id = req.cookies["user_id"];
+    if (!user_id) {
+     res.status(403).redirect("/login");
+    }
+
     const user = users[user_id];
     const templateVars = { 
       user
