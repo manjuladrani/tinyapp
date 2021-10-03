@@ -1,10 +1,9 @@
 const express = require("express");
-const uuid = require('uuid/v4');
+//const uuid = require('uuid/v4');
 const bcrypt = require('bcryptjs');
 const PORT = 8080;
 const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
-//const cookieParser = require('cookie-parser');
 const { name } = require("body-parser");
 const { getUserByEmail, generateRandomString, urlsForUser } = require('./helpers');
 
@@ -12,7 +11,6 @@ const { getUserByEmail, generateRandomString, urlsForUser } = require('./helpers
 const app = express();
 app.use(bodyParser.urlencoded({extended: true}));
 
-//app.use(cookieParser());
 app.use(cookieSession({
   name: 'session',
   keys: ['key1', 'key2']
@@ -36,7 +34,7 @@ app.set("view engine", "ejs");
         userID: "aJ48lW"
     }
 };
-
+//------------------------[ User database ]-----------------------------
   const users = { 
     "userRandomID": {
       id: "userRandomID", 
@@ -157,7 +155,7 @@ app.get("/login", (req, res) => {
 })
 
 
-
+//----------------------------------------------------------------
 
 app.post("/urls", (req, res) => {
   console.log(req.body);  // Log the POST request body to the console
@@ -182,12 +180,16 @@ app.post("/urls", (req, res) => {
      }
 
  });
+
+ //------------------------------------------------------------------------
+
  app.post('/urls/:shortURL', (req, res) => {
     if (urlDatabase[req.params.shortURL]) {
         urlDatabase[req.params.shortURL]['longURL'] = req.body.longURL;
         res.redirect('/urls');
     }
  })
+//--------------------------[ Login Post ]------------------------------------
 
  app.post("/login", (req, res) => {
     console.log('req.body:', req.body);
@@ -202,14 +204,12 @@ app.post("/urls", (req, res) => {
       return res.status(401).render('login', templateVars);
     }
     const user = getUserByEmail(email, users);
-    //console.log("user Id from line 170", useId);
-    console.log(user);
-    //console.log(user['id']);
-    //const user_id = user['id'];
-   // const newUserrandomID = generateRandomString()
    
     
+    //const user_id = user['id'];
+   // const newUserrandomID = generateRandomString()
     //res.cookie("username", email);
+    
     if(!user) {
       let templateVars = {
         user: null,
@@ -252,15 +252,18 @@ app.post("/urls", (req, res) => {
     
 });
 
+//--------------------------------------[ Logout Post ]-------------------------
+
  app.post("/logout", (req, res) => {
      //res.clearCookie("user_id");
      req.session = null;
      res.redirect("/urls");
  })
 
+ //-------------------------------------[ Register get]--------------------------
+
  app.get('/register', (req, res) => {
     
-   
     let templateVars = {
         user: null,
         error: ''
@@ -269,6 +272,8 @@ app.post("/urls", (req, res) => {
     // display the register form
     res.render('register', templateVars);
   });
+
+  //-------------------------------------[ Register Post]--------------------------
 
 app.post('/register', (req, res) => {
     //need to extract the info from the body
