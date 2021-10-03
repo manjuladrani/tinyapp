@@ -3,12 +3,18 @@ const uuid = require('uuid/v4');
 
 const PORT = 8080;
 const bodyParser = require("body-parser");
+//const cookieSession = require("cookie-session");
 const cookieParser = require('cookie-parser');
 const { name } = require("body-parser");
 const app = express();
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.use(cookieParser());
+// app.use(cookieSession({
+//   name: 'session',
+//   keys: ['CAITLIN'],
+//   maxAge: 24 * 60 * 60 * 1000,
+// }));
 
 app.set("view engine", "ejs");
 
@@ -50,15 +56,11 @@ const generateRandomString = function() {
     }
     return result;
   };
- const createNewUser_id = () => {
-     return user_Id = uuid().substr(0, 7);
+//  const createNewUser_id = () => {
+//      return user_Id = uuid().substr(0, 7);
      
-    //  const newuserid = {
-    //      id: user_Id,
-         
-    //  };
-    //  users[user_Id] = newuserid;
- }
+    
+//  }
  const finduserByEmail = function (email, users) {
     for (let userId in users) {
         
@@ -77,6 +79,18 @@ const auyhenticateUser =function (email, password, users) {
     }
     return false;
 }
+
+
+// Return an object of URLs with same userID as the user
+const urlsForUser = function(id, urlDatabase) {
+  const userUrls = {};
+  for (const shortURL in urlDatabase) {
+    if (urlDatabase[shortURL].userID === id) {
+      userUrls[shortURL] = urlDatabase[shortURL];
+    }
+  }
+  return userUrls;
+};
 //--------------------------------------------------------------------
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -96,8 +110,9 @@ app.get("/urls", (req, res) => {
   const user_id = req.cookies["user_id"];
   const user = users[user_id];
   const templateVars = { 
-    user,  
+     user,  
     urls: urlDatabase 
+    
 };
   res.render("urls_index", templateVars)
 });
@@ -142,7 +157,8 @@ app.get("/login", (req, res) => {
     let user_id = req.cookies['user_id'];
     //const username = req.cookies["user_Id"]
     let templateVars = {
-        user: null
+        user: null,
+        error: ''
     };
 
     res.render('login',templateVars);
@@ -183,6 +199,14 @@ app.post("/urls", (req, res) => {
     console.log('req.body:', req.body);
     const email = req.body.email;
     const password = req.body.password;
+
+    if(email === '' || password === '') {
+      let templateVars = {
+        user: null,
+        error: "Email and Password is required!"
+      };
+      return res.status(401).render('login', templateVars);
+    }
     const user = finduserByEmail(email, users);
     //console.log("user Id from line 170", useId);
     console.log(user);
@@ -192,7 +216,25 @@ app.post("/urls", (req, res) => {
    
     
     //res.cookie("username", email);
-     if(user) {
+    if(!user) {
+      let templateVars = {
+        user: null,
+        error: "User is not registerd!"
+      };
+      return res.status(401).render('login', templateVars);
+    }
+
+   if (user['password'] !== password) {
+     let templateVars = {
+       user: null,
+       error: "Wrong credentials entered. Please correct them"
+     };
+     return res.status(401).render('login', templateVars);
+   }
+
+   res.cookie("user_id", user_id);
+   return res.redirect("/urls");
+     /* if(user) {
       //  console.log('password' + password + 'l');
       //  console.log(user['password']);
       if(user['password'] === password) {
@@ -200,11 +242,17 @@ app.post("/urls", (req, res) => {
         return res.redirect("/urls");
       }
       console.log("Bad password");
-      return res.redirect("/login");
+      let templateVars = {
+        user_id: null,
+        message : "Wrong credentials entered. Please correct them"}
+      res.redirect("/login",templateVars)
+      //return res.redirect("/login");
     }
 
     console.log("Bad email");
-    return res.redirect("/login");
+    //res.status(401).send('User Not Registered');
+    //return res.redirect("/register")
+    //return res.redirect("/login"); */
     
 });
 
@@ -217,7 +265,8 @@ app.post("/urls", (req, res) => {
     
    const user_id = req.cookies["user_id"]
     let templateVars = {
-        user: null
+        user: null,
+        error: ''
     };
     
     // display the register form
@@ -227,8 +276,22 @@ app.post("/urls", (req, res) => {
 app.post('/register', (req, res) => {
     //need to extract the info from the body
     const { email, password } = req.body
-    if (!email || !password) return res.status(400).send("Email or password cant be empty");
-    if (finduserByEmail(email, users)) return res.status(400).send("Email is taken");
+    //if (!email || !password) return res.status(400).send("Email or password cant be empty");
+  if (email === '' || password === '') {
+    let templateVars = {
+      user: null,
+      error: "Email and Password is required!"
+    };
+    return res.status(400).render('register', templateVars);
+  }
+    if (finduserByEmail(email, users)){
+      let templateVars = {
+        user: null,
+        error: "Email is already Exist!"
+      };
+      return res.status(400).render('register', templateVars);
+      //return res.status(400).send("Email is taken");
+    } 
 
     const newUserrandomID = generateRandomString()
     const newUser = {
