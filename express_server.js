@@ -6,6 +6,9 @@ const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 //const cookieParser = require('cookie-parser');
 const { name } = require("body-parser");
+const { finduserByEmail, generateRandomString, urlsForUser } = require('./helpers');
+
+
 const app = express();
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -47,49 +50,25 @@ app.set("view engine", "ejs");
     }
   }
 
-const generateRandomString = function() {
-    let result = '';
-    const char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    for (let i = 0; i < 6; i++) {
-      result += char.charAt(Math.floor(Math.random() * char.length));
-    }
-    return result;
-  };
+
 //  const createNewUser_id = () => {
 //      return user_Id = uuid().substr(0, 7);
      
     
 //  }
- const finduserByEmail = function (email, users) {
-    for (let userId in users) {
-        
-        if (email === users[userId].email) {
-            return users[userId];
-        }
-    }
-    return false;
-};
-const auyhenticateUser =function (email, password, users) {
+ 
+// const auyhenticateUser =function (email, password, users) {
 
-    const userFound = finduserByEmail(email, users);
+//     const userFound = finduserByEmail(email, users);
 
-    if(userFound && userFound.password === password) {
-        return userFound;
-    }
-    return false;
-}
+//     if(userFound && userFound.password === password) {
+//         return userFound;
+//     }
+//     return false;
+// }
 
 
-// Return an object of URLs with same userID as the user
-const urlsForUser = function(id, urlDatabase) {
-  const userUrls = {};
-  for (const shortURL in urlDatabase) {
-    if (urlDatabase[shortURL].userID === id) {
-      userUrls[shortURL] = urlDatabase[shortURL];
-    }
-  }
-  return userUrls;
-};
+
 //--------------------------------------------------------------------
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -225,7 +204,7 @@ app.post("/urls", (req, res) => {
     const user = finduserByEmail(email, users);
     //console.log("user Id from line 170", useId);
     console.log(user);
-    console.log(user['id']);
+    //console.log(user['id']);
     //const user_id = user['id'];
    // const newUserrandomID = generateRandomString()
    
@@ -275,7 +254,7 @@ app.post("/urls", (req, res) => {
 
  app.post("/logout", (req, res) => {
      //res.clearCookie("user_id");
-     req.session =
+     req.session = null;
      res.redirect("/urls");
  })
 
